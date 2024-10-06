@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CompaneyMvcDAL.Models;
 using CompaneyMvcPL.Models;
 using CompaneyMvcPL.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -14,16 +15,18 @@ using System.Threading.Tasks;
 
 namespace CompaneyMvcPL.Controllers
 {
-    [Authorize]
+    [Authorize(Roles ="Admin")]
     public class RoleController : Controller
     {
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly IMapper mapper;
-        
-        public RoleController(RoleManager<IdentityRole> roleManager,IMapper mapper) 
+        private readonly UserManager<ApplicationUser> usermanager;
+
+        public RoleController(RoleManager<IdentityRole> roleManager,IMapper mapper,UserManager<ApplicationUser> manageRole) 
         {
             this.roleManager = roleManager;
             this.mapper = mapper;
+            this.usermanager = manageRole;
         }
         #region index
         public async Task<IActionResult> Index(string SearchValue)
@@ -173,5 +176,65 @@ namespace CompaneyMvcPL.Controllers
             return View(role);
         }
         #endregion
-    }
+        public async Task<IActionResult> AddOrRemoveUser(string roleId)
+        {
+            var role =await roleManager.FindByIdAsync(roleId);
+            if (role is null)
+            {
+                return BadRequest();
+
+            }
+            ViewData["RoleId"]=roleId;
+            var usersInRole =new List<AddOrRemoveUser>();
+            var users = await usermanager.Users.ToListAsync();
+            foreach(var user in users)
+            {
+                var userInrole = new AddOrRemoveUser()
+                {
+                    UsrId = user.Id,
+                    UserName = user.UserName,
+                };
+
+                if (await usermanager.IsInRoleAsync(user, role.Name))
+                {
+                    userInrole.IsSelected = true;
+                }
+                else
+                {
+                    userInrole.IsSelected =false;
+                }
+               usersInRole.Add(userInrole);
+            }
+            return View(usersInRole);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddOrRemoveUser(string roleid, List<AddOrRemoveUser> users)
+        {
+            var role = await roleManager.FindByIdAsync(roleid);
+            if (role is null)
+            {
+                return BadRequest();
+
+            }
+            if (ModelState.IsValid)
+            {
+                foreach (var user in users)
+                {
+                    var Appuser = await usermanager.FindByIdAsync(user.UsrId);
+                    if (user.IsSelected && ! await usermanager.IsInRoleAsync(Appuser,role.Name))
+                    {
+                        await usermanager.AddToRoleAsync(Appuser, role.Name);
+                    }
+                    else
+                    {
+                        await usermanager.RemoveFromRoleAsync(Appuser, role.Name);
+                    }
+                }
+
+                return RedirectToAction("Edit", new { id = roleid });
+            }
+            return View(users);
+        }
+
+        }
 }

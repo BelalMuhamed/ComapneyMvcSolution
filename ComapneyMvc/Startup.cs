@@ -49,7 +49,7 @@ namespace ComapneyMvc
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(Options =>
             {
                 Options.LoginPath=("_Account/Login");
-                Options.AccessDeniedPath = "Home/Privacy";
+                Options.AccessDeniedPath = "_Account/AccessDenied";
             });
         }
 

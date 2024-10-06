@@ -161,5 +161,12 @@ namespace CompaneyMvcPL.Controllers
 
             return View(PassModel);
         }
+
+        public IActionResult AccessDenied()
+        {
+
+        return View();
+        }    
+    
     }
 }
