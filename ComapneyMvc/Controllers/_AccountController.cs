@@ -1,8 +1,11 @@
 ﻿using CompaneyMvcDAL.Models;
+using CompaneyMvcPL.Helper;
 using CompaneyMvcPL.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages;
+using NuGet.Common;
 using System.Threading.Tasks;
 
 namespace CompaneyMvcPL.Controllers
@@ -38,7 +41,7 @@ namespace CompaneyMvcPL.Controllers
                 var Result = await _useManage.CreateAsync(User,RegModel.Password);
                 if(Result.Succeeded)
                 {
-                    return RedirectToAction("Index","Employee");
+                    return RedirectToAction("Login", "_Account");
                 }
                 else
                 {
@@ -98,16 +101,20 @@ namespace CompaneyMvcPL.Controllers
         {
             if(ModelState.IsValid)
             {
-                var result = await _useManage.FindByEmailAsync(model.Email);
-                if (result is not null) 
+                var user = await _useManage.FindByEmailAsync(model.Email);
+                if (user is not null) 
                 {
+                    var token = await _useManage.GeneratePasswordResetTokenAsync(user);
+                    var PasswordLink = Url.Action("ResetPassword", "_Account", new { email = user.Email, Token = token }, Request.Scheme);
+                   
                     var email = new Email()
                     {
                         To = model.Email,
                         Subject = "reset password",
-                        Body = "reset password link"
+                        Body = PasswordLink
                     };
-                   
+                    EmailSttings.SendEmail(email);
+                    return RedirectToAction(nameof(CheckYourEmail));
                 }
                 else
                 {
@@ -115,6 +122,44 @@ namespace CompaneyMvcPL.Controllers
                 }
             }
             return View("ForgetPassword",model);
+        }
+        public IActionResult CheckYourEmail()
+        {
+            
+            return View();
+        }
+        public IActionResult ResetPassword(string email,string token)
+        {
+            TempData["Email"] = email;
+            TempData["token"] = token;
+
+
+            return View();
+        }
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel PassModel)
+        {
+            if(ModelState.IsValid)
+            {
+                var email = TempData["Email"] as string;
+                var token = TempData["token"] as string;
+                var user =await _useManage.FindByEmailAsync(email);
+               var result =   await _useManage.ResetPasswordAsync(user, token,PassModel.NewPassword);
+                if (result.Succeeded) 
+                {
+                    return RedirectToAction(nameof(Login));
+                }
+                else
+                {
+                    foreach(var item in result.Errors)
+                    {
+                        ModelState.AddModelError(string.Empty,item.Description);
+                    }
+                }
+            }
+           
+
+            return View(PassModel);
         }
     }
 }
