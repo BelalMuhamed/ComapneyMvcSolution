@@ -1,9 +1,18 @@
+using CompaneyMvcBLL.Interfaces;
+using CompaneyMvcBLL.Repositries;
+using CompaneyMvcDAL.DbContext;
+using CompaneyMvcDAL.Models;
+using CompaneyMvcPL.MappingProfiles;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +33,24 @@ namespace ComapneyMvc
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
+            services.AddDbContext<ComapneyMvcDbContext>(Options => Options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")) );  
+            //services.AddScoped<IDepartmentRepositry,DepartmentRepositry>();
+            //services.AddScoped<IEmployeeRepositry,EmployeeRepositry>();
+            
+            services.AddAutoMapper(M => { M.AddProfile(new EmployeeProfile()); M.AddProfile(new DepartmentProfile());M.AddProfile(new UserProfile());M.AddProfile(new RoleProfile()); });
+
+            services.AddScoped<IUnitOfWork,UnitOfWork>();
+            services.AddIdentity<ApplicationUser, IdentityRole>(Options => 
+            {
+                Options.Password.RequireNonAlphanumeric = true;
+                Options.Password.RequireDigit = true;
+                Options.Password.RequireLowercase = true;
+                Options.Password.RequireUppercase = true; }).AddEntityFrameworkStores<ComapneyMvcDbContext>().AddDefaultTokenProviders();
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(Options =>
+            {
+                Options.LoginPath=("_Account/Login");
+                Options.AccessDeniedPath = "Home/Privacy";
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -43,14 +70,15 @@ namespace ComapneyMvc
             app.UseStaticFiles();
 
             app.UseRouting();
-
+           
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
+                    pattern: "{controller=_Account}/{action=Login}/{id?}");
             });
         }
     }

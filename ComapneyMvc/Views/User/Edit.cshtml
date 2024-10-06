@@ -1,0 +1,43 @@
+﻿@model UsersViewModel
+@{
+    ViewData["Title"] = "Edit";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<center class="m-4"><h1>Edit @Model.FName @Model.LName </h1></center>
+<div asp-validation-summary="All"></div>
+<form asp-action="Edit">
+    <input asp-for="Email" hidden/>
+@*FName*@
+<div class="form-group">
+    <label asp-for="FName" class="col-form-label"></label>
+    <input  asp-for="FName" class="form-control" />
+    <span asp-validation-for="FName" class="text-danger"></span>
+</div>
+@*LName*@
+<div class="form-group">
+    <label asp-for="LName" class="col-form-label"></label>
+    <input  asp-for="LName" class="form-control" />
+        <span asp-validation-for="FName" class="text-danger"></span>
+</div>
+
+
+@*Phone number*@
+<div class="form-group">
+    <label asp-for="PhoneNumber" class="col-form-label"></label>
+    <input  asp-for="PhoneNumber" class="form-control" />
+        <span asp-validation-for="FName" class="text-danger"></span>
+</div>
+ <input type="submit" value="Save" class="btn btn-success" />
+
+<a asp-action="Index" class="btn btn-light">Back To List</a>
+</form>
+
+
+
+@section ValidationScriptSection
+{
+    <partial name="_ValidationScriptsPartial" />
+
+
+}

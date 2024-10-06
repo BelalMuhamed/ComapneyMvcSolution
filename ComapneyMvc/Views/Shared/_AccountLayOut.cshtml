@@ -1,0 +1,32 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <!-- Font Icon -->
+    <link rel="stylesheet" href="D:\back end route\Aliaa\MVC\ComapneyMvcSolution\ComapneyMvc\wwwroot\Fonts\material-icon\css\material-design-iconic-font.css">
+    
+    <!-- Main css -->
+    <link rel="stylesheet" href="~/css/StyleSheet.css">
+</head>
+<body>
+
+    <div class="main">
+       
+        <div class="container">
+            <div class="signup-content">
+                @RenderBody()
+            </div>
+        </div>
+
+    </div>
+
+    <!-- JS -->
+    <script src="~/js/main.js"></script>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("ClientValidation", required: true)
+</body><!-- This templates was made by Colorlib (https://colorlib.com) -->
+</html>
