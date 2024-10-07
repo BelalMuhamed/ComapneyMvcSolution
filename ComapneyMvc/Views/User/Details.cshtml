@@ -1,0 +1,43 @@
+﻿@model UsersViewModel
+@{
+    ViewData["Title"] = "Details";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<center class="m-4"><h1>Details of @Model.FName @Model.LName </h1></center>
+@*id*@
+<div class="form-group">
+    <label asp-for="Id" class="col-form-label"></label>
+    <input readonly asp-for="Id" class="form-control" />
+
+</div>
+
+@*FName*@
+<div class="form-group">
+    <label asp-for="FName" class="col-form-label"></label>
+    <input readonly asp-for="FName" class="form-control" />
+
+</div>
+@*LName*@
+<div class="form-group">
+    <label asp-for="LName" class="col-form-label"></label>
+    <input readonly asp-for="LName" class="form-control" />
+
+</div>
+@*Email*@
+<div class="form-group">
+    <label asp-for="Email" class="col-form-label"></label>
+    <input readonly asp-for="Email" class="form-control" />
+
+</div>
+@*Phone number*@
+<div class="form-group">
+    <label asp-for="PhoneNumber" class="col-form-label"></label>
+    <input readonly asp-for="PhoneNumber" class="form-control" />
+
+</div>
+
+<a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-dark">Edit</a>
+<a asp-action="Index" class="btn btn-light">Back To List</a>
+
+

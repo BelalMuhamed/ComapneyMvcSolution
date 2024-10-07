@@ -1,0 +1,42 @@
+﻿@model RegisterViewModel
+@{
+    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_AccountLayOut.cshtml";
+}
+<div asp-validation-summary="All"></div>
+<form asp-action="Register" id="signup-form" class="signup-form">
+    <h2>Sign up </h2>
+    
+    <div class="form-group">
+        <input asp-for="@Model.FName" class="form-input"  id="name" placeholder="Your first Name" />
+        <span asp-validation-for="@Model.FName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <input asp-for="@Model.LName" class="form-input" id="name" placeholder="Your last Name" />
+        <span asp-validation-for="@Model.LName"></span>
+    </div>
+    <div class="form-group">
+        <input asp-for="@Model.Email" class="form-input" id="name" placeholder="Your Email" />
+        <span asp-validation-for="@Model.Email"></span>
+    </div>
+    <div class="form-group">
+        <input asp-for="@Model.Password" class="form-input" id="name" placeholder=" password like $%# 123 AaBb" />
+        <span asp-validation-for="@Model.Password"></span>
+    </div>
+    <div class="form-group">
+        <input asp-for="@Model.ConfirmedPassword" class="form-input" id="name" placeholder="confirm  password" />
+        <span asp-validation-for="@Model.ConfirmedPassword"></span>
+    </div>
+    <div class="form-group">
+        <input asp-for="@Model.IsAgree" type="checkbox" id="agree-term" class="agree-term" />
+        <label for="agree-term" class="label-agree-term"><span><span></span></span>I agree all statements in  <a href="#" class="term-service">Terms of service</a></label>
+    </div>
+    <div class="form-group">
+        <input type="submit" name="submit" id="submit" class="form-submit submit" value="Sign up" />
+        <a asp-action="Login"  class="submit-link submit">Sign in</a>
+    </div>
+</form>
+@section ClientValidation
+{
+    <partial name="_ValidationScriptsPartial" />
+}
