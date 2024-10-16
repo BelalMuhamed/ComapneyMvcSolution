@@ -48,8 +48,13 @@ namespace ComapneyMvc
                 Options.Password.RequireUppercase = true; }).AddEntityFrameworkStores<ComapneyMvcDbContext>().AddDefaultTokenProviders();
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme).AddCookie(Options =>
             {
-                Options.LoginPath=("_Account/Login");
-                Options.AccessDeniedPath = "_Account/AccessDenied";
+                Options.LoginPath="/_Account/Login";
+               
+            });
+            services.ConfigureApplicationCookie(config =>
+            {
+                config.LoginPath = "/_Account/Login";
+                config.AccessDeniedPath = "/_Account/AccessDenied";
             });
         }
 

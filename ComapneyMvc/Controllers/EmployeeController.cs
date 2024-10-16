@@ -105,47 +105,88 @@ namespace CompaneyMvcPL.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public  async Task<IActionResult> Edit(EmployeeViewModel employee,[FromRoute] int? id)
+        //public  async Task<IActionResult> Edit(EmployeeViewModel employee,[FromRoute] int? id)
+        //{
+        //    if (id != employee.Id)
+        //        return BadRequest();
+        //    else
+        //    {
+        //        if (ModelState.IsValid)
+        //        {
+        //            try
+        //            {
+        //                string DeleteImage = employee.ImageName;
+        //                if (employee.Image != null && employee.Image.Length > 0)
+        //                {
+        //                    employee.ImageName = DocumentSetting.Upload(employee.Image, "Images");
+        //                }
+        //                var mappedEmp = mapper.Map<EmployeeViewModel, Employee>(employee);
+        //                _unitOFwork.EmployeeRepo.Update(mappedEmp);
+
+        //               int result=await _unitOFwork.CompleteAsync();
+        //                if (result > 0 && DeleteImage is not null&&employee.Image != null && employee.Image.Length > 0)
+        //                {
+        //                    DocumentSetting.DeleteFile(DeleteImage, "Images");
+        //                }
+
+        //                return RedirectToAction(nameof(Index));
+        //            }
+        //            catch (System.Exception ex)
+        //            {
+        //                ModelState.AddModelError(string.Empty, ex.Message);
+        //            }
+        //        }
+
+
+        //        return View(employee);
+
+        //    }
+        //}
+        public async Task<IActionResult> Edit(EmployeeViewModel employee, [FromRoute] int? id)
         {
             if (id != employee.Id)
-                return BadRequest();
-            else
-            {
-                if (ModelState.IsValid)
-                {
-                    try
-                    {
-                        string DeleteImage = employee.ImageName;
-                        if (employee.Image != null && employee.Image.Length > 0)
-                        {
-                            employee.ImageName = DocumentSetting.Upload(employee.Image, "Images");
-                        }
-                        var mappedEmp = mapper.Map<EmployeeViewModel, Employee>(employee);
-                        _unitOFwork.EmployeeRepo.Update(mappedEmp);
+                return BadRequest("Employee ID mismatch.");
 
-                       int result=await _unitOFwork.CompleteAsync();
-                        if (result > 0 && DeleteImage is not null&&employee.Image != null && employee.Image.Length > 0)
-                        {
-                            DocumentSetting.DeleteFile(DeleteImage, "Images");
-                        }
-
-                        return RedirectToAction(nameof(Index));
-                    }
-                    catch (System.Exception ex)
-                    {
-                        ModelState.AddModelError(string.Empty, ex.Message);
-                    }
-                }
-
-
+            if (!ModelState.IsValid)
                 return View(employee);
 
+            try
+            {
+                string deleteImage = employee.ImageName;
+
+                // Check if a new image is uploaded
+                if (employee.Image != null && employee.Image.Length > 0)
+                {
+                    // Upload the new image and set the image name
+                    employee.ImageName = DocumentSetting.Upload(employee.Image, "Images");
+                }
+
+                var mappedEmp = mapper.Map<EmployeeViewModel, Employee>(employee);
+                _unitOFwork.EmployeeRepo.Update(mappedEmp);
+
+                int result = await _unitOFwork.CompleteAsync();
+
+                // If update is successful and a new image was uploaded, delete the old image
+                if (result > 0 && deleteImage != null && employee.Image != null && employee.Image.Length > 0)
+                {
+                    DocumentSetting.DeleteFile(deleteImage, "Images");
+                }
+
+                return RedirectToAction(nameof(Index));
             }
+            catch (System.Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                // Consider logging the error message for further analysis
+            }
+
+            return View(employee);
         }
+
         #endregion
 
         #region Delete
-        public  async Task<IActionResult> Delete([FromRoute] int? id)
+        public async Task<IActionResult> Delete([FromRoute] int? id)
         {
             return await Details(id, "Delete");
         }
