@@ -38,8 +38,8 @@
 @*select department*@
 <div class="form-group">
     <label asp-for="Department" class="col-form-label"></label>
-    <select asp-for="DepartmentId" class="form-control" asp-items="@departments" >
-
+    <select class="form-control" asp-items="@departments" asp-for="DepartmentId">
+        <option value="@null">------ select department -------</option>
     </select>
     
 </div>
